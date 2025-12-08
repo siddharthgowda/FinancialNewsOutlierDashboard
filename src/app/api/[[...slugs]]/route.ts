@@ -159,8 +159,12 @@ const app = new Elysia({ prefix: '/api' })
       }
 
       try {
-        // Use Hugging Face Inference endpoint (GCP custom endpoint)
-        const inferenceEndpoint = 'https://f3fzibzv69idnkg8.us-east4.gcp.endpoints.huggingface.cloud'
+        // WARNING: This endpoint is for demonstration purposes only.
+        // For anyone other than the authors (Siddharth Gowda, Ruitao Xu, Renying Chen) of this project,
+        // you MUST replace this with your own hosted model endpoint.
+        // Using this endpoint without permission violates the license terms.
+        // See README.md for details on configuring your own endpoint.
+        const inferenceEndpoint = 'https://api-inference.huggingface.co/models/siddharthgowda/EECS6893-finbert-stock-prediction'
         
         const response = await fetch(inferenceEndpoint, {
           method: 'POST',

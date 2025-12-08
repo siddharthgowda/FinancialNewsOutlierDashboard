@@ -56,6 +56,8 @@ HUGGING_FACE_TOKEN=your_huggingface_token_here
 POLYGON_API_KEY=your_massive_com_api_key_here
 ```
 
+**Note**: You must configure your own model inference endpoint. See the [Model Details](#model-details) section below.
+
 4. Start the development server:
 ```bash
 bun dev
@@ -95,9 +97,14 @@ src/
 
 ## Model Details
 
-The dashboard uses a custom fine-tuned FinBERT model hosted on Hugging Face:
-- **Model**: `siddharthgowda/EECS6893-finbert-stock-prediction`
-- **Endpoint**: Custom GCP Inference endpoint
+**IMPORTANT**: You must use your own hosted model endpoint. The model endpoint referenced in this codebase is for demonstration purposes only and is not available for public use.
+
+To use this dashboard, you must:
+1. Deploy your own FinBERT model (or use a compatible model) to Hugging Face Inference API or your own hosting infrastructure
+2. Update the inference endpoint URL in `src/app/api/[[...slugs]]/route.ts` to point to your own endpoint
+3. Ensure your model returns predictions in the format: `{label: 0|1, score: number}` where `label > 0.5` indicates an outlier
+
+The dashboard expects a binary classification model that returns:
 - **Output**: Binary classification (0 = normal, 1 = outlier) with confidence scores
 
 ## Development
@@ -118,4 +125,32 @@ bun run lint
 
 ## License
 
-This project is part of the EECS6893 Final Project at Columbia University.
+MIT License
+
+Copyright (c) 2024
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+2. **Model Endpoint Restriction**: Any model inference endpoints, API endpoints, or 
+   hosted services referenced in this Software are provided for demonstration purposes 
+   only. Users are strictly prohibited from using, accessing, or relying on any 
+   endpoints or services owned or operated by the copyright holder. Users must deploy 
+   and configure their own model inference endpoints and services. Any attempt to use 
+   the copyright holder's endpoints or services without explicit written permission 
+   constitutes a violation of this license.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
