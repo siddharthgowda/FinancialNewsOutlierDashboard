@@ -9,7 +9,7 @@ This dashboard fetches financial news from the Massive.com News API and uses a c
 ## Features
 
 - **Real-time News Fetching**: Automatically fetches news from the last 24 hours for any of 100+ predefined stock tickers
-- **AI-Powered Predictions**: Uses a fine-tuned FinBERT model (`siddharthgowda/EECS6893-finbert-stock-prediction`) to classify news as normal or outlier
+- **AI-Powered Predictions**: Uses a fine-tuned FinBERT model (`siddharthgowda/finbert-stock-news-outlier-prediction`) to classify news as normal or outlier
 - **Auto-Prediction**: Automatically analyzes new articles as they arrive with intelligent duplicate prevention
 - **Live Polling**: Refreshes news data every 60 seconds to keep you up-to-date
 - **Visual Analytics**: 
