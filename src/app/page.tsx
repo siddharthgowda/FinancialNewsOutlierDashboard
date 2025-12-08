@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { WordCloud } from '@/components/word-cloud'
+import { StackedBarChart } from '@/components/stacked-bar-chart'
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { TICKERS } from '@/constants/tickers'
@@ -70,7 +70,7 @@ export default function Home() {
   }, [newsWithPredictions])
 
   // Extract words from all headlines and calculate frequencies
-  const wordCloudData = useMemo(() => {
+  const wordFrequencyData = useMemo(() => {
     if (!newsData?.news || newsData.news.length === 0) return []
 
     // Common stop words to filter out
@@ -102,23 +102,11 @@ export default function Home() {
       })
     })
 
-    // Convert to array and sort by frequency
-    const wordsArray = Array.from(wordCounts.entries())
+    // Convert to array and sort by frequency (most to least frequent), then take top 5
+    return Array.from(wordCounts.entries())
       .map(([text, count]) => ({ text, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 50) // Top 50 words
-
-    // Scale sizes (min: 10, max: 60)
-    const maxCount = wordsArray[0]?.count || 1
-    const minCount = wordsArray[wordsArray.length - 1]?.count || 1
-    const countRange = maxCount - minCount || 1 // Avoid division by zero
-    
-    return wordsArray.map(({ text, count }) => ({
-      text,
-      size: countRange > 0 
-        ? 10 + ((count - minCount) / countRange) * 50
-        : 30, // Default size if all words have same count
-    }))
+      .slice(0, 10) // Only show top 10 words
   }, [newsData?.news])
 
   const handlePredict = useCallback(
@@ -218,24 +206,24 @@ export default function Home() {
   }, [fetchTicker, refetch])
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Financial News Dashboard</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1 text-foreground">Financial News Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
           Analyze news headlines for stock market outliers using FinBERT
         </p>
       </div>
 
       <div className="mb-6">
         <div className="max-w-xs">
-          <label htmlFor="ticker-select" className="block text-sm font-medium mb-2">
+          <label htmlFor="ticker-select" className="block text-sm font-medium mb-2 text-foreground">
             Select Ticker
           </label>
           <select
             id="ticker-select"
             value={selectedTicker}
             onChange={(e) => setSelectedTicker(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 transition-all"
           >
             <option value="">-- Select a ticker --</option>
             {TICKERS.map((ticker) => (
@@ -257,76 +245,51 @@ export default function Home() {
       )}
 
       {fetchTicker && newsData?.ticker && (
-        <div className="mb-4 space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Showing news for <span className="font-semibold text-foreground">{newsData.ticker}</span>
-            {newsData.count !== undefined && (
-              <span className="ml-2">({newsData.count} articles)</span>
-            )}
-          </p>
+        <div className="mb-6">
+          {/* Header */}
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">
+              Showing news for <span className="font-semibold text-foreground">{newsData.ticker}</span>
+              {newsData.count !== undefined && (
+                <span className="ml-2">({newsData.count} articles)</span>
+              )}
+            </p>
+          </div>
           
-          {/* Prediction Statistics */}
+          {/* Prediction Statistics Card - At Top */}
           {predictionStats.total > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 shadow-sm mb-6">
+              <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-foreground">Prediction Distribution</h3>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                   {predictionStats.total} analyzed
                 </span>
               </div>
               
-              {/* Progress Bar */}
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 mb-2 overflow-hidden relative flex">
-                {predictionStats.normalPercent > 0 && (
-                  <div
-                    className="h-full bg-green-500 dark:bg-green-600 transition-all duration-500 ease-out flex items-center justify-center"
-                    style={{ width: `${predictionStats.normalPercent}%` }}
-                  >
-                    {predictionStats.normalPercent > 10 && (
-                      <span className="text-xs font-semibold text-white">
-                        {predictionStats.normalPercent.toFixed(1)}%
-                      </span>
-                    )}
-                  </div>
-                )}
-                {predictionStats.outlierPercent > 0 && (
-                  <div
-                    className="h-full bg-red-500 dark:bg-red-600 transition-all duration-500 ease-out flex items-center justify-center"
-                    style={{ width: `${predictionStats.outlierPercent}%` }}
-                  >
-                    {predictionStats.outlierPercent > 10 && (
-                      <span className="text-xs font-semibold text-white">
-                        {predictionStats.outlierPercent.toFixed(1)}%
-                      </span>
-                    )}
-                  </div>
-                )}
+              {/* D3 Stacked Bar Chart */}
+              <div className="mb-3 w-full">
+                <StackedBarChart 
+                  normal={predictionStats.normal} 
+                  outlier={predictionStats.outlier}
+                  width={800}
+                  height={120}
+                />
               </div>
               
               {/* Stats Text */}
-              <div className="flex items-center gap-4 text-xs">
+              <div className="flex flex-col gap-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500 dark:bg-green-600"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-600"></div>
                   <span className="text-muted-foreground">
                     Normal: <span className="font-semibold text-foreground">{predictionStats.normal}</span> ({predictionStats.normalPercent.toFixed(1)}%)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500 dark:bg-red-600"></div>
+                  <div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-600"></div>
                   <span className="text-muted-foreground">
                     Outlier: <span className="font-semibold text-foreground">{predictionStats.outlier}</span> ({predictionStats.outlierPercent.toFixed(1)}%)
                   </span>
                 </div>
-              </div>
-            </div>
-          )}
-          
-          {/* Word Cloud */}
-          {wordCloudData.length > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Word Cloud from Headlines</h3>
-              <div className="flex justify-center">
-                <WordCloud words={wordCloudData} width={700} height={400} />
               </div>
             </div>
           )}
@@ -336,11 +299,11 @@ export default function Home() {
       {newsLoading ? (
         <div className="text-center py-8">Loading news...</div>
       ) : !fetchTicker ? (
-        <div className="text-center py-12 border rounded-lg bg-gray-50 dark:bg-gray-900">
-          <p className="text-muted-foreground">Select a ticker and click &quot;Fetch News&quot; to get started</p>
+        <div className="text-center py-12 border rounded-lg bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+          <p className="text-muted-foreground">Select a ticker to get started</p>
         </div>
       ) : (
-        <div className="border rounded-lg">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -397,6 +360,31 @@ export default function Home() {
                   </TableRow>
                 ))
               )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Keyword Frequency Table - At Bottom */}
+      {fetchTicker && wordFrequencyData.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm mt-6 overflow-hidden">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-800">
+            <h3 className="text-sm font-semibold text-foreground">Keyword Frequency</h3>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="py-2 px-4">Keyword</TableHead>
+                <TableHead className="text-right py-2 px-4 w-24">Frequency</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {wordFrequencyData.map((item, index) => (
+                <TableRow key={`${item.text}-${index}`}>
+                  <TableCell className="font-medium py-2 px-4">{item.text}</TableCell>
+                  <TableCell className="text-right py-2 px-4">{item.count}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
