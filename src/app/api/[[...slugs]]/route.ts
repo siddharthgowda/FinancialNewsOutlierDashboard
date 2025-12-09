@@ -164,15 +164,15 @@ const app = new Elysia({ prefix: '/api' })
         // you MUST replace this with your own hosted model endpoint.
         // Using this endpoint without permission violates the license terms.
         // See README.md for details on configuring your own endpoint.
-        const inferenceEndpoint = 'https://api-inference.huggingface.co/models/siddharthgowda/EECS6893-finbert-stock-prediction'
+        const inferenceEndpoint = 'https://f3fzibzv69idnkg8.us-east4.gcp.endpoints.huggingface.cloud'
         
         const response = await fetch(inferenceEndpoint, {
-          method: 'POST',
           headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+          method: "POST",
           body: JSON.stringify({
             inputs: body.title,
             parameters: {},
