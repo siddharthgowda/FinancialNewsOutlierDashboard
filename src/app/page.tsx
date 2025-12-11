@@ -56,15 +56,18 @@ export default function Home() {
     const itemsWithPredictions = newsWithPredictions.filter((item) => item.prediction)
     const total = itemsWithPredictions.length
     if (total === 0) {
-      return { normal: 0, outlier: 0, normalPercent: 0, outlierPercent: 0, total: 0 }
+      return { positive: 0, negative: 0, neutral: 0, positivePercent: 0, negativePercent: 0, neutralPercent: 0, total: 0 }
     }
-    const outlierCount = itemsWithPredictions.filter((item) => item.prediction?.isOutlier).length
-    const normalCount = total - outlierCount
+    const positiveCount = itemsWithPredictions.filter((item) => item.prediction?.label === 'positive').length
+    const negativeCount = itemsWithPredictions.filter((item) => item.prediction?.label === 'negative').length
+    const neutralCount = itemsWithPredictions.filter((item) => item.prediction?.label === 'neutral').length
     return {
-      normal: normalCount,
-      outlier: outlierCount,
-      normalPercent: (normalCount / total) * 100,
-      outlierPercent: (outlierCount / total) * 100,
+      positive: positiveCount,
+      negative: negativeCount,
+      neutral: neutralCount,
+      positivePercent: (positiveCount / total) * 100,
+      negativePercent: (negativeCount / total) * 100,
+      neutralPercent: (neutralCount / total) * 100,
       total,
     }
   }, [newsWithPredictions])
@@ -269,8 +272,9 @@ export default function Home() {
               {/* D3 Stacked Bar Chart */}
               <div className="mb-3 w-full">
                 <StackedBarChart 
-                  normal={predictionStats.normal} 
-                  outlier={predictionStats.outlier}
+                  positive={predictionStats.positive} 
+                  negative={predictionStats.negative}
+                  neutral={predictionStats.neutral}
                   width={800}
                   height={120}
                 />
@@ -281,13 +285,19 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-600"></div>
                   <span className="text-muted-foreground">
-                    Normal: <span className="font-semibold text-foreground">{predictionStats.normal}</span> ({predictionStats.normalPercent.toFixed(1)}%)
+                    Positive: <span className="font-semibold text-foreground">{predictionStats.positive}</span> ({predictionStats.positivePercent.toFixed(1)}%)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-gray-500 dark:bg-gray-600"></div>
+                  <span className="text-muted-foreground">
+                    Neutral: <span className="font-semibold text-foreground">{predictionStats.neutral}</span> ({predictionStats.neutralPercent.toFixed(1)}%)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-600"></div>
                   <span className="text-muted-foreground">
-                    Outlier: <span className="font-semibold text-foreground">{predictionStats.outlier}</span> ({predictionStats.outlierPercent.toFixed(1)}%)
+                    Negative: <span className="font-semibold text-foreground">{predictionStats.negative}</span> ({predictionStats.negativePercent.toFixed(1)}%)
                   </span>
                 </div>
               </div>
@@ -331,13 +341,15 @@ export default function Home() {
                     <TableCell>
                       {item.prediction ? (
                         <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${
-                            item.prediction.isOutlier
+                          className={`px-2 py-1 rounded text-xs font-semibold capitalize ${
+                            item.prediction.label === 'negative'
                               ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : item.prediction.label === 'positive'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
                           }`}
                         >
-                          {item.prediction.isOutlier ? 'Outlier' : 'Normal'}
+                          {item.prediction.label}
                         </span>
                       ) : (
                         <span className="text-muted-foreground">-</span>

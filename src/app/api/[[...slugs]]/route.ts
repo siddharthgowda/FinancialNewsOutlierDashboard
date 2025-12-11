@@ -164,7 +164,7 @@ const app = new Elysia({ prefix: '/api' })
         // you MUST replace this with your own hosted model endpoint.
         // Using this endpoint without permission violates the license terms.
         // See README.md for details on configuring your own endpoint.
-        const inferenceEndpoint = 'https://f3fzibzv69idnkg8.us-east4.gcp.endpoints.huggingface.cloud'
+        const inferenceEndpoint = 'https://wal8pi4mis7eo02j.us-east4.gcp.endpoints.huggingface.cloud'
         
         const response = await fetch(inferenceEndpoint, {
           headers: {
@@ -192,13 +192,12 @@ const app = new Elysia({ prefix: '/api' })
 
         const result = await response.json()
 
-        // Inference API returns array or single object with label/score
-        // Handle both formats: [{label: 0, score: ...}] or {label: 0, score: ...}
+        // Inference API returns array with label/score
+        // Format: [{label: "neutral", score: ...}] or [{label: "negative", score: ...}] or [{label: "positive", score: ...}]
         const prediction = Array.isArray(result) ? result[0] : result
         
         // Validate prediction structure
-        // Note: label can be 0 (number), so check for undefined instead of falsy
-        if (!prediction || prediction.label === undefined || typeof prediction.score !== 'number') {
+        if (!prediction || !prediction.label || typeof prediction.score !== 'number') {
           console.error('Invalid prediction format:', prediction)
           set.status = 500
           return { 
@@ -207,14 +206,15 @@ const app = new Elysia({ prefix: '/api' })
           }
         }
 
-        // Determine if outlier (label is numeric: 0 = normal, 1 = outlier)
-        const isOutlier = Number(prediction.label) > 0.5
+        // Map sentiment labels to outlier classification: negative = outlier, neutral/positive = normal
+        const label = String(prediction.label).toLowerCase()
+        const isOutlier = label === 'negative'
 
         return {
           id: body.id,
           title: body.title,
           prediction: {
-            label: String(prediction.label), // Convert to string for consistency
+            label: prediction.label, // "neutral", "negative", or "positive"
             score: prediction.score,
             isOutlier,
           },
