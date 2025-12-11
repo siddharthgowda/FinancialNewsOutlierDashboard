@@ -1,19 +1,19 @@
 # Financial News Dashboard
 
-A real-time financial news dashboard that analyzes stock market headlines using a fine-tuned FinBERT model to identify potential outliers and market-moving events.
+A real-time financial news dashboard that analyzes stock market headlines using a fine-tuned FinBERT model to predict stock price direction based on news content.
 
 ## Overview
 
-This dashboard fetches financial news from the Massive.com News API and uses a custom Hugging Face FinBERT model to predict whether news articles represent normal market activity or potential outliers. Built with Next.js 16, it provides a clean, modern interface for monitoring financial news and understanding sentiment patterns.
+This dashboard fetches financial news from the Massive.com News API and uses a custom Hugging Face FinBERT model to classify news articles and predict the likely direction of stock prices. The model classifies news as predicting positive, negative, or neutral stock movement. Built with Next.js 16, it provides a clean, modern interface for monitoring financial news and understanding how news might impact stock prices.
 
 ## Features
 
 - **Real-time News Fetching**: Automatically fetches news from the last 24 hours for any of 100+ predefined stock tickers
-- **AI-Powered Predictions**: Uses a fine-tuned FinBERT model (`siddharthgowda/finbert-stock-news-outlier-prediction`) to classify news as normal or outlier
+- **AI-Powered Stock Direction Prediction**: Uses a fine-tuned FinBERT model to classify news articles and predict stock price direction (positive, negative, or neutral)
 - **Auto-Prediction**: Automatically analyzes new articles as they arrive with intelligent duplicate prevention
 - **Live Polling**: Refreshes news data every 60 seconds to keep you up-to-date
 - **Visual Analytics**: 
-  - D3 stacked bar chart showing prediction distribution
+  - D3 stacked bar chart showing distribution of predicted stock directions
   - Keyword frequency analysis highlighting top trending terms
 - **Clean Dashboard UI**: Minimalist design with responsive layout
 
@@ -71,8 +71,8 @@ npm run dev
 
 1. Select a stock ticker from the dropdown menu
 2. The dashboard automatically fetches and analyzes news articles
-3. View prediction results in the stacked bar chart (green = normal, red = outlier)
-4. Browse individual articles in the table below
+3. View prediction results in the stacked bar chart (green = positive direction, gray = neutral, red = negative direction)
+4. Browse individual articles in the table below to see predicted stock direction for each headline
 5. Check the keyword frequency table to see trending terms
 
 ## Project Structure
@@ -102,10 +102,10 @@ src/
 To use this dashboard, you must:
 1. Deploy your own FinBERT model (or use a compatible model) to Hugging Face Inference API or your own hosting infrastructure
 2. Update the inference endpoint URL in `src/app/api/[[...slugs]]/route.ts` to point to your own endpoint
-3. Ensure your model returns predictions in the format: `{label: 0|1, score: number}` where `label > 0.5` indicates an outlier
+3. Ensure your model returns predictions in the format: `[{label: "positive"|"negative"|"neutral", score: number}]`
 
-The dashboard expects a binary classification model that returns:
-- **Output**: Binary classification (0 = normal, 1 = outlier) with confidence scores
+The dashboard expects a three-class classification model that returns:
+- **Output**: Classification with labels "positive", "negative", or "neutral" (predicting stock price direction) along with confidence scores
 
 ## Development
 
