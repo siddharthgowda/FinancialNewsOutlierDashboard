@@ -250,13 +250,13 @@ export default function Home() {
       {fetchTicker && newsData?.ticker && (
         <div className="mb-6">
           {/* Header */}
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground">
-              Showing news for <span className="font-semibold text-foreground">{newsData.ticker}</span>
-              {newsData.count !== undefined && (
-                <span className="ml-2">({newsData.count} articles)</span>
-              )}
-            </p>
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground">
+            Showing news for <span className="font-semibold text-foreground">{newsData.ticker}</span>
+            {newsData.count !== undefined && (
+              <span className="ml-2">({newsData.count} articles)</span>
+            )}
+          </p>
           </div>
           
           {/* Prediction Statistics Card - At Top */}

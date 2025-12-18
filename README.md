@@ -107,6 +107,18 @@ To use this dashboard, you must:
 The dashboard expects a three-class classification model that returns:
 - **Output**: Classification with labels "positive", "negative", or "neutral" (predicting stock price direction) along with confidence scores
 
+## Model Training
+
+The model training code used to fine-tune the FinBERT model and other alternative models is available in the `model_training` folder. However, please note that this code was originally developed and run on Google Colab and is **not directly runnable** in this repository as-is.
+
+To use the training code, you will need to:
+- Set up your own training environment (Google Colab, local GPU setup, or cloud compute)
+- Install the required dependencies and packages
+- Configure paths for your dataset and model output locations
+- Adjust any environment-specific settings and configurations
+
+The training scripts are provided for reference and transparency about how the model was developed, but they require modifications to match your specific environment and setup.
+
 ## Development
 
 ```bash
